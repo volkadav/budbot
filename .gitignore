@@ -1,0 +1,8 @@
+src/main/resources/apitoken
+build/
+
+# editor temp files and the like
+.idea/*
+gradle/*
+.gradle/*
+*.swp
