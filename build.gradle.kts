@@ -10,7 +10,7 @@ repositories {
 }
 
 dependencies {
-    implementation("org.telegram:telegrambots:6.3.0")
+    implementation("org.telegram:telegrambots:6.5.0")
     implementation("org.projectlombok:lombok:1.18.22")
     implementation("com.google.guava:guava:31.1-jre")
 
@@ -32,4 +32,8 @@ tasks.jar {
         .map(::zipTree)
     from(dependencies)
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
+tasks.compileJava {
+    options.compilerArgs.add("-Xlint:deprecation")
 }

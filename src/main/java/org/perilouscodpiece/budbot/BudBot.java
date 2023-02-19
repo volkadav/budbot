@@ -15,20 +15,13 @@ import java.util.List;
 
 @Log
 public class BudBot extends TelegramLongPollingBot {
-    private final String telegramApiToken ;
-
     public BudBot(String telegramApiToken) {
-        this.telegramApiToken = telegramApiToken;
+        super(telegramApiToken);
     }
 
     @Override
     public String getBotUsername() {
         return "budholebot";
-    }
-
-    @Override
-    public String getBotToken() {
-        return this.telegramApiToken;
     }
 
     @Override

@@ -15,7 +15,7 @@ import java.io.InputStreamReader;
 public class Main {
     public static void main(String[] args) {
         // load api key
-        String telegramApiKey = "";
+        String telegramApiKey = null;
         try (InputStream tokIn = Main.class.getClassLoader().getResourceAsStream("apitoken");
             BufferedReader bufin = new BufferedReader(new InputStreamReader(tokIn))) {
             telegramApiKey = bufin.readLine().trim();

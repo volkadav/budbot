@@ -4,7 +4,6 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import lombok.extern.java.Log;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.regex.Matcher;
