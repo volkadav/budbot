@@ -10,14 +10,14 @@ repositories {
 }
 
 dependencies {
-    implementation("org.telegram:telegrambots:6.5.0")
-    implementation("org.projectlombok:lombok:1.18.22")
-    implementation("com.google.guava:guava:31.1-jre")
+    implementation("org.telegram:telegrambots:6.7.0")
+    implementation("org.projectlombok:lombok:1.18.28")
+    implementation("com.google.guava:guava:32.1.1-jre")
 
-    annotationProcessor("org.projectlombok:lombok:1.18.22")
+    annotationProcessor("org.projectlombok:lombok:1.18.28")
 
-    testImplementation("org.junit.jupiter:junit-jupiter-api:5.8.1")
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.8.1")
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.9.3")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.9.3")
 }
 
 tasks.getByName<Test>("test") {
