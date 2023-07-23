@@ -1,8 +1,11 @@
 package org.perilouscodpiece.budbot.actions;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
 import com.google.common.escape.Escaper;
@@ -25,7 +28,8 @@ import java.util.Map;
 
 @Slf4j
 public class Weather {
-    private static final ObjectMapper om = new ObjectMapper()
+    @VisibleForTesting
+    protected static final ObjectMapper om = new ObjectMapper()
             .setPropertyNamingStrategy(new PropertyNamingStrategies.SnakeCaseStrategy())
             .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     private static final HttpClient httpClient = HttpClient.newHttpClient();
@@ -98,7 +102,8 @@ public class Weather {
             this.wmoDesc = desc;
         }
 
-        public static WMOcode valueOfCode(int wmoCode) {
+        @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
+        public static WMOcode valueOfCode(@JsonProperty("weathercode") Integer wmoCode) {
             return BY_CODE.getOrDefault(wmoCode, UNKNOWN);
         }
     }
@@ -158,7 +163,7 @@ public class Weather {
 
         @Override
         public String toString() {
-            return "Weather @ " + getTime() + ": " + (isDay() ? "(day)" : "(night)") +
+            return "Weather @ " + getTime() + " " + (isDay() ? "(day)" : "(night)") + ": " +
                     getTemperature() + "°C, " +
                     getWeathercode().wmoDesc + ", " +
                     "winds from " +

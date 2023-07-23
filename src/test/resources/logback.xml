@@ -9,7 +9,7 @@
         </layout>
     </appender>
 
-    <logger name="org.perilouscodpiece" level="info" additivity="false">
+    <logger name="org.perilouscodpiece" level="debug" additivity="false">
         <appender-ref ref="CONSOLE"/>
     </logger>
 
