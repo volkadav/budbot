@@ -3,6 +3,7 @@ package org.perilouscodpiece.budbot;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
 import org.glassfish.jersey.internal.guava.Lists;
 import org.perilouscodpiece.budbot.actions.Choose;
 import org.perilouscodpiece.budbot.actions.CoinToss;
@@ -15,7 +16,7 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.util.List;
 
-@Log
+@Slf4j
 public class BudBot extends TelegramLongPollingBot {
     public BudBot(String telegramApiToken) {
         super(telegramApiToken);
@@ -34,18 +35,16 @@ public class BudBot extends TelegramLongPollingBot {
         log.info(sender.toString() + " says: " + msgText);
         List<String> cmdTokens = Lists.newArrayList(Splitter.on(" ").split(msgText));
 
-        String response = "wat";
         String cmd = cmdTokens.remove(0);
-        switch (cmd) {
-            case "choose" -> response = Choose.between(cmdTokens);
-            case "cointoss" -> response = CoinToss.tossCoin();
-            case "dice" -> response = Dice.roll(cmdTokens);
-            case "weather" -> response = Weather.getCurrentWeather(cmdTokens.stream().reduce("", String::concat));
-            default -> {
-                log.info("Unrecognized message: " + msgText);
-                response = "Sorry, I don't understand '" + msgText + "'.";
-            }
-        }
+        log.info("cmd: {}", cmd);
+        String response = switch (cmd) {
+            case "choose" -> Choose.between(cmdTokens);
+            case "cointoss" -> CoinToss.tossCoin();
+            case "dice" -> Dice.roll(cmdTokens);
+            case "weather" -> Weather.getCurrentWeather(cmdTokens.stream().reduce("", String::concat));
+            default -> "Sorry, I don't understand '" + msgText + "'.";
+        };
+        log.info("response: {}", response);
 
         sendText(sender.getId(), response);
     }

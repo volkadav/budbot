@@ -3,13 +3,13 @@ package org.perilouscodpiece.budbot.actions;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
-import com.fasterxml.jackson.databind.PropertyNamingStrategy;
-import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
+import com.google.common.escape.Escaper;
+import com.google.common.net.UrlEscapers;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import org.checkerframework.checker.units.qual.Current;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.net.URI;
@@ -22,13 +22,14 @@ import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
+@Slf4j
 public class Weather {
     private static final ObjectMapper om = new ObjectMapper()
             .setPropertyNamingStrategy(new PropertyNamingStrategies.SnakeCaseStrategy())
             .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     private static final HttpClient httpClient = HttpClient.newHttpClient();
+    private static final Escaper urlEscaper = UrlEscapers.urlPathSegmentEscaper();
 
     @Data
     @AllArgsConstructor
@@ -157,7 +158,6 @@ public class Weather {
 
         @Override
         public String toString() {
-
             return "Weather @ " + getTime() + ": " + (isDay() ? "(day)" : "(night)") +
                     getTemperature() + "°C, " +
                     getWeathercode().wmoDesc + ", " +
@@ -207,16 +207,17 @@ public class Weather {
             return "please either supply a shortcut city name or a latitude,longitude pair";
         }
 
-        String currentWeatherURL = "https://api.open-meteo.com/v1/forecast?latitude={LAT}&longitude=-{LON}&current_weather=true&forecast_days=0"
-                .replace("{LAT}", lat.toString())
-                .replace("{LON}", lon.toString());
+        String currentWeatherURL = "https://api.open-meteo.com/v1/forecast?latitude={LAT}&longitude={LON}&current_weather=true&forecast_days=0"
+                .replace("{LAT}", urlEscaper.escape(lat.toString()))
+                .replace("{LON}", urlEscaper.escape(lon.toString()));
 
         if (!Strings.isNullOrEmpty(tz)) {
-            currentWeatherURL += "&timezone=" + tz;
+            currentWeatherURL += "&timezone=" + urlEscaper.escape(tz);
         }
 
         // todo: cache result to be nice to counterparty (10 minutes?)
         // todo: maybe use ratelimiter from guava too?
+        log.info("weather URL: {}", currentWeatherURL);
         String responseBody;
         try {
             HttpRequest request = HttpRequest.newBuilder().uri(new URI(currentWeatherURL))
@@ -225,11 +226,16 @@ public class Weather {
                                                           .build();
 
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-            if (response.statusCode() != 200) {
-                return "Non-200 response code from open-meteo API: " + response.statusCode();
+            int statusCode = response.statusCode();
+            String body = response.body();
+
+            if (statusCode != 200) {
+                log.warn("Non-200 response code from open-meteo API: {}, response body: {}", statusCode, body);
+                return "Non-200 response code from open-meteo API: " + statusCode;
+            } else {
+                log.info("200 OK from open-meteo");
             }
 
-            String body = response.body();
             if (body.contains("error")) {
                 return "looks like open-meteo is returning an error: " + body;
             }

@@ -2,16 +2,16 @@ package org.perilouscodpiece.budbot.actions;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
-import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
 import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-@Log
+@Slf4j
 public class Dice {
-    private static final Pattern rollSpecPattern = Pattern.compile("^(\\d*)[dD](\\d+) *[+\\-]? *(\\d+)?");
+    private static final Pattern rollSpecPattern = Pattern.compile("^(\\d*)[dD](\\d+)[+\\-]?(\\d+)?");
 
     public static String roll(List<String> cmdTokens) {
         if (cmdTokens.size() == 1) {
@@ -45,18 +45,20 @@ public class Dice {
 
             return roll(count, sides, modifier, reportIndividualRolls);
         } catch (NumberFormatException nfe) {
-            log.severe("number format exception in Dice.roll(string): " + nfe.getMessage());
+            log.warn("number format exception in Dice.roll(string): " + nfe.getMessage());
             return "oops! " + nfe.getMessage();
         }
     }
 
     public static String roll(int number, int sides, int modifier, boolean reportIndividualRolls) {
+        log.info("dice number: {} dice sides: {} total modifier: {} report each roll? {}", number, sides, modifier, reportIndividualRolls);
         Random rnd = new Random(System.currentTimeMillis());
         StringBuilder response = new StringBuilder();
         List<Integer> results = Lists.newArrayListWithCapacity(number);
 
         for (int i = 0; i < number; i++) {
             int roll = rnd.nextInt( sides) + 1;
+            log.info("rolled a d{}, got {}", sides, roll);
             results.add(roll);
         }
 
