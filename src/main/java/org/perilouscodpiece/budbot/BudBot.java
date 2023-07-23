@@ -1,11 +1,13 @@
 package org.perilouscodpiece.budbot;
 
+import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import lombok.extern.java.Log;
 import org.glassfish.jersey.internal.guava.Lists;
 import org.perilouscodpiece.budbot.actions.Choose;
 import org.perilouscodpiece.budbot.actions.CoinToss;
 import org.perilouscodpiece.budbot.actions.Dice;
+import org.perilouscodpiece.budbot.actions.Weather;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -38,7 +40,11 @@ public class BudBot extends TelegramLongPollingBot {
             case "choose" -> response = Choose.between(cmdTokens);
             case "cointoss" -> response = CoinToss.tossCoin();
             case "dice" -> response = Dice.roll(cmdTokens);
-            default -> log.info("Unrecognized message: " + msgText);
+            case "weather" -> response = Weather.getCurrentWeather(cmdTokens.stream().reduce("", String::concat));
+            default -> {
+                log.info("Unrecognized message: " + msgText);
+                response = "Sorry, I don't understand '" + msgText + "'.";
+            }
         }
 
         sendText(sender.getId(), response);
