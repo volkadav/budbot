@@ -113,46 +113,46 @@ public class Weather {
     public static class CurrentWeather {
         private double temperature;
         private double windspeed;
-        private int winddirection; // degrees, North = 0
+        private double winddirection; // degrees, North = 0
         private WMOcode weathercode;
         private boolean isDay;
         private String time; // YYYY-MM-DDTHH:MMM format, fwiw
 
-        public static String degreeDirectionToCardinal(int windDirection) {
-            if (windDirection < 0 || windDirection > 360) {
+        public static String degreeDirectionToCardinal(double windDirection) {
+            if (windDirection < 0.0 || windDirection > 360.0) {
                 return "bad direction";
             }
 
             String cardinalDirection;
-            if (windDirection >= 348 || windDirection < 11) {
+            if (windDirection >= 348.75 || windDirection < 11.25) {
                 cardinalDirection = "N";
-            } else if (windDirection < 34) {
+            } else if (windDirection < 33.75) {
                 cardinalDirection = "NNE";
-            } else if (windDirection < 56) {
+            } else if (windDirection < 56.25) {
                 cardinalDirection = "NE";
-            } else if (windDirection < 79) {
+            } else if (windDirection < 78.75) {
                 cardinalDirection = "ENE";
-            } else if (windDirection < 101) {
+            } else if (windDirection < 101.25) {
                 cardinalDirection = "E";
-            } else if (windDirection < 124) {
+            } else if (windDirection < 123.75) {
                 cardinalDirection = "ESE";
-            } else if (windDirection < 146) {
+            } else if (windDirection < 146.25) {
                 cardinalDirection = "SE";
-            } else if (windDirection < 168) {
+            } else if (windDirection < 168.75) {
                 cardinalDirection = "SSE";
-            } else if (windDirection < 191) {
+            } else if (windDirection < 191.25) {
                 cardinalDirection = "S";
-            } else if (windDirection < 214) {
+            } else if (windDirection < 213.75) {
                 cardinalDirection = "SSW";
-            } else if (windDirection < 236) {
+            } else if (windDirection < 236.25) {
                 cardinalDirection = "SW";
-            } else if (windDirection < 259) {
+            } else if (windDirection < 258.75) {
                 cardinalDirection = "WSW";
-            } else if (windDirection < 281) {
+            } else if (windDirection < 281.25) {
                 cardinalDirection = "W";
-            } else if (windDirection < 304) {
+            } else if (windDirection < 303.75) {
                 cardinalDirection = "WNW";
-            } else if (windDirection < 326) {
+            } else if (windDirection < 326.25) {
                 cardinalDirection = "NW";
             } else {
                 cardinalDirection = "NNW";
