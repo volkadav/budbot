@@ -222,7 +222,7 @@ public class Weather {
 
         // todo: cache result to be nice to counterparty (10 minutes?)
         // todo: maybe use ratelimiter from guava too?
-        log.info("weather URL: {}", currentWeatherURL);
+        log.debug("weather URL: {}", currentWeatherURL);
         String responseBody;
         try {
             HttpRequest request = HttpRequest.newBuilder().uri(new URI(currentWeatherURL))
@@ -238,7 +238,7 @@ public class Weather {
                 log.warn("Non-200 response code from open-meteo API: {}, response body: {}", statusCode, body);
                 return "Non-200 response code from open-meteo API: " + statusCode;
             } else {
-                log.info("200 OK from open-meteo");
+                log.debug("200 OK from open-meteo");
             }
 
             if (body.contains("error")) {

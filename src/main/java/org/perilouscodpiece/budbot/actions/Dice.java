@@ -11,13 +11,13 @@ import java.util.regex.Pattern;
 
 @Slf4j
 public class Dice {
-    private static final Pattern rollSpecPattern = Pattern.compile("^(\\d*)[dD](\\d+)[+\\-]?(\\d+)?");
+    private static final Pattern rollSpecPattern = Pattern.compile("^(\\d*)[dD](\\d+)([+\\-])?(\\d+)?");
 
     public static String roll(List<String> cmdTokens) {
         if (cmdTokens.size() == 1) {
             return roll(cmdTokens.get(0), false);
         } else if (cmdTokens.size() == 2) {
-            return roll(cmdTokens.get(0), cmdTokens.get(1).equals("showeach"));
+            return roll(cmdTokens.get(0), cmdTokens.get(1).equalsIgnoreCase("showeach"));
         } else {
             return "usage: XdY[+-Z] [showeach]";
         }
@@ -35,11 +35,12 @@ public class Dice {
             int count = Integer.parseInt(match.group(1));
             int sides = Integer.parseInt(match.group(2));
 
-            if (match.groupCount() == 3) {
-                if (match.group(3).equals("-")) {
-                    modifier -= Integer.parseInt(match.group(3));
+            String modifierSign = match.group(3);
+            if (modifierSign != null) {
+                if (modifierSign.equals("-")) {
+                    modifier -= Integer.parseInt(match.group(4));
                 } else {
-                    modifier += Integer.parseInt(match.group(3));
+                    modifier += Integer.parseInt(match.group(4));
                 }
             }
 

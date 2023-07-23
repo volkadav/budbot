@@ -2,6 +2,7 @@ package org.perilouscodpiece.budbot;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
+import com.google.common.base.Strings;
 import lombok.extern.java.Log;
 import lombok.extern.slf4j.Slf4j;
 import org.glassfish.jersey.internal.guava.Lists;
@@ -30,27 +31,38 @@ public class BudBot extends TelegramLongPollingBot {
     @Override
     public void onUpdateReceived(Update update) {
         var msg = update.getMessage();
+        if (msg == null) {
+            // this seems to be what we get when someone edits a prior message
+            log.debug("null message");
+            return;
+        }
+
         var msgText = msg.getText();
+        if (!msgText.startsWith("!")) {
+            log.debug("message does not start with command signifier, ignoring.");
+            return;
+        }
+
         var sender = msg.getFrom();
-        log.info(sender.toString() + " says: " + msgText);
+        log.debug(sender.toString() + " sent: " + msgText);
         List<String> cmdTokens = Lists.newArrayList(Splitter.on(" ").split(msgText));
 
-        String cmd = cmdTokens.remove(0);
-        log.info("cmd: {}", cmd);
-        String response = switch (cmd) {
-            case "choose" -> Choose.between(cmdTokens);
-            case "cointoss" -> CoinToss.tossCoin();
-            case "dice" -> Dice.roll(cmdTokens);
-            case "weather" -> Weather.getCurrentWeather(cmdTokens.stream().reduce("", String::concat));
+        var cmd = cmdTokens.remove(0);
+        log.debug("cmd: {}", cmd);
+        var response = switch (cmd) {
+            case "!choose" -> Choose.between(cmdTokens);
+            case "!cointoss" -> CoinToss.tossCoin();
+            case "!dice", "!roll" -> Dice.roll(cmdTokens);
+            case "!weather" -> Weather.getCurrentWeather(cmdTokens.stream().reduce("", String::concat));
             default -> "Sorry, I don't understand '" + msgText + "'.";
         };
-        log.info("response: {}", response);
+        log.debug("response: {}", response);
 
-        sendText(sender.getId(), response);
+        sendText(msg.getChatId(), response);
     }
 
     public void sendText(Long who, String what) {
-        SendMessage sm = SendMessage.builder()
+        var sm = SendMessage.builder()
                 .chatId(who.toString())
                 .text(what).build();
         try {
