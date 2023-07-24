@@ -38,6 +38,10 @@ public class BudBot extends TelegramLongPollingBot {
         }
 
         var msgText = msg.getText();
+        if (Strings.isNullOrEmpty(msgText)) {
+            log.debug("null/empty message text");
+            return;
+        }
         if (!msgText.startsWith("!")) {
             log.debug("message does not start with command signifier, ignoring.");
             return;
