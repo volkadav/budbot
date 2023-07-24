@@ -50,7 +50,8 @@ public class Weather {
             "nyc", new CityData(40.7128, -74.0060, "America/New_York"),
             "sf", new CityData(37.7749, -122.4194, "America/Los_Angeles"),
             "chicago", new CityData(41.8781, -87.6298, "America/Chicago"),
-            "boston", new CityData(42.3601, -71.0589, "America/New_York")
+            "boston", new CityData(42.3601, -71.0589, "America/New_York"),
+            "hell", new CityData(63.4452, 10.9052, "Europe/Oslo")
     );
 
     public enum WMOcode {
