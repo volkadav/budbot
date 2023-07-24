@@ -1,22 +1,16 @@
 package org.perilouscodpiece.budbot.actions;
 
+import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 
 import java.util.List;
 import java.util.Random;
 
 public class Choose {
-    public static String between(List<String> options) {
-        Random rnd = new Random(System.currentTimeMillis());
-        int which = rnd.nextInt(options.size());
-        String chosen = options.get(which);
+    private static final Random rnd = new Random(System.currentTimeMillis());
 
-        if (chosen.contains(",")) {
-            List<String> suboptions = Splitter.on(",").splitToList(chosen);
-            which = rnd.nextInt(suboptions.size());
-            chosen = suboptions.get(which);
-        }
-
-        return chosen;
+    public static String between(List<String> tokens) {
+        List<String> options = Splitter.on(",").splitToList(Joiner.on(" ").join(tokens));
+        return options.get(rnd.nextInt(options.size())).trim();
     }
 }

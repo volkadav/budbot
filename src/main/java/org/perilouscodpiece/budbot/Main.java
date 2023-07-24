@@ -19,7 +19,7 @@ public class Main {
         try (InputStream tokIn = Main.class.getClassLoader().getResourceAsStream("apitoken");
             BufferedReader bufin = new BufferedReader(new InputStreamReader(tokIn))) {
             telegramApiKey = bufin.readLine().trim();
-        } catch (IOException ioe) {
+        } catch (IOException|NullPointerException ioe) {
             System.err.println("Received exception reading api token: " + ioe.getMessage());
             System.exit(1);
         }
