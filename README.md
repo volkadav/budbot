@@ -15,5 +15,7 @@ don't forget to put your Telegram api token in src/main/resources/apitoken
 java -jar /path/to/jarfile
 
 ## Tested on
+JDK 17 (21 does not compile yet due to lombok/gradle/et al. issues)
 
-linux
+linux x86
+macos aarch64

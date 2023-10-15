@@ -12,7 +12,7 @@ repositories {
 
 dependencies {
     implementation("org.telegram:telegrambots:6.7.0")
-    implementation("org.projectlombok:lombok:1.18.28")
+    implementation("org.projectlombok:lombok:1.18.30")
     implementation("com.google.guava:guava:32.1.1-jre")
     implementation("org.slf4j:slf4j-jdk14:2.0.7")
 
