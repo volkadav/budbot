@@ -46,8 +46,8 @@ public class BudBot extends TelegramLongPollingBot {
             log.debug("message does not start with command signifier, ignoring.");
             return;
         }
-        if (msgText.matches("/^!+$/")) {
-            log.debug("message is only !s");
+        if (msgText.matches("/^!{2,}/")) {
+            log.debug("message is probably just someone expressing surprise, not a command");
             return;
         }
 
