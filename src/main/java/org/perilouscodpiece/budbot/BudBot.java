@@ -1,9 +1,7 @@
 package org.perilouscodpiece.budbot;
 
-import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
-import lombok.extern.java.Log;
 import lombok.extern.slf4j.Slf4j;
 import org.glassfish.jersey.internal.guava.Lists;
 import org.perilouscodpiece.budbot.actions.Choose;
@@ -46,7 +44,7 @@ public class BudBot extends TelegramLongPollingBot {
             log.debug("message does not start with command signifier, ignoring.");
             return;
         }
-        if (msgText.matches("/^!{2,}/")) {
+        if (msgText.matches("^!{2,}")) {
             log.debug("message is probably just someone expressing surprise, not a command");
             return;
         }
