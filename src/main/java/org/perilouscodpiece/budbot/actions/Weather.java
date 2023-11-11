@@ -116,6 +116,7 @@ public class Weather {
         private double windspeed;
         private double winddirection; // degrees, North = 0
         private WMOcode weathercode;
+        @JsonProperty("is_day")
         private boolean isDay;
         private String time; // YYYY-MM-DDTHH:MMM format, fwiw
 
