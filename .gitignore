@@ -3,6 +3,5 @@ build/
 
 # editor temp files and the like
 .idea/*
-gradle/*
-.gradle/*
 *.swp
+.gradle/*
