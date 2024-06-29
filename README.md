@@ -9,6 +9,7 @@ gradle clean test jar (or ./gradlew etc.)
 (makes build/libs/budbot-{version string}.jar)
 
 don't forget to put your Telegram api token in src/main/resources/apitoken
+(for the actual #budhole budbot, gpg -d apitoken.asc in that dir before build)
 
 ## Run
 
