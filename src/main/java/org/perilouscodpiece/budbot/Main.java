@@ -17,9 +17,9 @@ public class Main {
         // load api key
         String telegramApiKey = null;
         try (InputStream tokIn = Main.class.getClassLoader().getResourceAsStream("apitoken");
-            BufferedReader bufin = new BufferedReader(new InputStreamReader(tokIn))) {
-            telegramApiKey = bufin.readLine().trim();
-        } catch (IOException|NullPointerException ioe) {
+             BufferedReader bufin = new BufferedReader(new InputStreamReader(tokIn))) {
+             telegramApiKey = bufin.readLine().trim();
+        } catch (IOException | NullPointerException ioe) {
             System.err.println("Received exception reading api token: " + ioe.getMessage());
             System.exit(1);
         }

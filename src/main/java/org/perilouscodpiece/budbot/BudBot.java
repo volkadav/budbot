@@ -54,15 +54,20 @@ public class BudBot extends TelegramLongPollingBot {
         log.debug(sender.toString() + " sent: " + msgText);
         List<String> cmdTokens = Lists.newArrayList(Splitter.on(" ").split(msgText));
 
-        var cmd = cmdTokens.remove(0);
-        log.debug("cmd: {}", cmd);
-        var response = switch (cmd) {
-            case "!choose" -> Choose.between(cmdTokens);
-            case "!cointoss" -> CoinToss.tossCoin();
-            case "!dice", "!roll" -> Dice.roll(cmdTokens);
-            case "!weather" -> Weather.getCurrentWeather(cmdTokens.stream().reduce("", String::concat));
-            default -> "Sorry, I don't understand '" + msgText + "'.";
-        };
+        var response = "";
+        if (cmdTokens.size() != 1) {
+            response = "can't parse command out of: " + msgText;
+        } else {
+            var cmd = cmdTokens.get(0);
+            log.debug("cmd: {}", cmd);
+            response = switch (cmd) {
+                case "!choose" -> Choose.between(cmdTokens);
+                case "!cointoss" -> CoinToss.tossCoin();
+                case "!dice", "!roll" -> Dice.roll(cmdTokens);
+                case "!weather" -> Weather.getCurrentWeather(cmdTokens.stream().reduce("", String::concat));
+                default -> "Sorry, I don't understand '" + msgText + "'.";
+            };
+        }
         log.debug("response: {}", response);
 
         sendText(msg.getChatId(), response);

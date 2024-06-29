@@ -225,7 +225,7 @@ public class Weather {
         // todo: cache result to be nice to counterparty (10 minutes?)
         // todo: maybe use ratelimiter from guava too?
         log.debug("weather URL: {}", currentWeatherURL);
-        String responseBody;
+
         try {
             HttpRequest request = HttpRequest.newBuilder().uri(new URI(currentWeatherURL))
                                                           .timeout(Duration.of(5, ChronoUnit.SECONDS))
