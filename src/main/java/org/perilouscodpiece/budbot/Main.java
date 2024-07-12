@@ -2,6 +2,7 @@ package org.perilouscodpiece.budbot;
 
 import com.google.common.base.Strings;
 import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
@@ -11,7 +12,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-@Log
+@Slf4j
 public class Main {
     public static void main(String[] args) {
         // load api key
@@ -24,10 +25,10 @@ public class Main {
             System.exit(1);
         }
         if (Strings.isNullOrEmpty(telegramApiKey)) {
-            log.severe("No api key retrieved from jar file! Exiting!");
+            System.err.println("No api key retrieved from jar file! Exiting!");
             System.exit(1);
         }
-        log.info("Using api key from jar file: " + telegramApiKey);
+        log.debug("Using api key from jar file: " + telegramApiKey);
 
         try {
             // register bot

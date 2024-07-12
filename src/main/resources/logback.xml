@@ -9,11 +9,11 @@
         </layout>
     </appender>
 
-    <logger name="org.perilouscodpiece" level="info" additivity="false">
+    <logger name="org.perilouscodpiece" level="${logging.level.app:-INFO}" additivity="false">
         <appender-ref ref="CONSOLE"/>
     </logger>
 
-    <root level="error">
+    <root level="${logging.level.root:-ERROR}">
         <appender-ref ref="CONSOLE"/>
     </root>
 

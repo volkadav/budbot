@@ -1,10 +1,11 @@
 plugins {
     id("java")
     id("com.adarshr.test-logger") version("3.2.0")
+    id("com.github.johnrengelman.shadow") version("8.1.1")
 }
 
 group = "org.perilouscodpiece"
-version = "1.0-SNAPSHOT"
+version = "1.1"
 
 repositories {
     mavenCentral()
@@ -12,14 +13,14 @@ repositories {
 
 dependencies {
     implementation("org.telegram:telegrambots:6.8.0")
-    implementation("org.projectlombok:lombok:1.18.30")
-    implementation("com.google.guava:guava:32.1.1-jre")
-    implementation("org.slf4j:slf4j-jdk14:2.0.7")
+    implementation("org.projectlombok:lombok:1.18.34")
+    implementation("com.google.guava:guava:33.2.1-jre")
+    implementation("ch.qos.logback:logback-classic:1.5.6")
 
-    annotationProcessor("org.projectlombok:lombok:1.18.30")
+    annotationProcessor("org.projectlombok:lombok:1.18.34")
 
-    testImplementation("org.junit.jupiter:junit-jupiter-api:5.9.3")
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.9.3")
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.10.3")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.10.3")
 }
 
 tasks.getByName<Test>("test") {
@@ -28,13 +29,7 @@ tasks.getByName<Test>("test") {
 
 tasks.jar {
     manifest.attributes["Main-Class"] = "org.perilouscodpiece.budbot.Main"
-    val dependencies = configurations
-        .runtimeClasspath
-        .get()
-        .map(::zipTree)
-    from(dependencies)
-    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-}
+ }
 
 tasks.compileJava {
     options.compilerArgs.add("-Xlint:deprecation")
