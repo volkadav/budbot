@@ -12,10 +12,15 @@ repositories {
 }
 
 dependencies {
-    implementation("org.telegram:telegrambots:6.8.0")
+    implementation("org.telegram:telegrambots:6.9.7.1") {
+        exclude("commons-codec","commons-codec")
+    }
+    implementation("commons-codec:commons-codec:1.17.1")
     implementation("org.projectlombok:lombok:1.18.34")
     implementation("com.google.guava:guava:33.2.1-jre")
     implementation("ch.qos.logback:logback-classic:1.5.6")
+    implementation("org.xerial:sqlite-jdbc:3.46.0.0")
+
 
     annotationProcessor("org.projectlombok:lombok:1.18.34")
 
@@ -29,6 +34,13 @@ tasks.getByName<Test>("test") {
 
 tasks.jar {
     manifest.attributes["Main-Class"] = "org.perilouscodpiece.budbot.Main"
+    // build uberjar:
+    val dependencies = configurations
+        .runtimeClasspath
+        .get()
+        .map(::zipTree)
+    from(dependencies)
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
  }
 
 tasks.compileJava {
