@@ -39,14 +39,21 @@ ExecStop=/bin/kill -15 $MAINPID
 [Install]
 WantedBy=multi-user.target
 ```
+
 The usual commands then work like:
+
 - systemctl daemon-reload
 - systemctl start/stop/restart/status budbot
 - journalctl -fu budbot
 - etc.
 
 ## Tested on
+
 JDK 17, 21
 
 linux x86
+
 macos aarch64
+
+(fundamentally this isn't doing anything crazy or platform-specific,
+ so it may well run on other versions/platforms fine, ymmv!)
