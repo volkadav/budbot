@@ -46,7 +46,7 @@ The usual commands then work like:
 - etc.
 
 ## Tested on
-JDK 17 (21 does not compile yet due to lombok/gradle/et al. issues)
+JDK 17, 21
 
 linux x86
 macos aarch64
