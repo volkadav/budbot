@@ -6,3 +6,7 @@ bin/
 .idea/*
 *.swp
 .gradle/*
+.classpath
+.factorypath
+.project
+.settings/
