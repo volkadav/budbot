@@ -41,17 +41,31 @@ public class Weather {
         private Double latitude, longitude;
         private String timezone; // for the open-meteo api, would need this for forecast info
     }
-    public static Map<String, CityData> shortcutCities = Map.of(
-            "seattle", new CityData(47.6062, -122.3321, "America/Los_Angeles"), // lat, lon
-            "austin", new CityData(30.2672, -97.7431, "America/Chicago"),
-            "glasgow", new CityData(55.8617, -4.295905, "Europe/London"),
-            "edmonton", new CityData(53.631611, -113.323975, "America/Edmonton"),
-            "london", new CityData(51.5072,-0.1276, "Europe/London"),
-            "nyc", new CityData(40.7128, -74.0060, "America/New_York"),
-            "sf", new CityData(37.7749, -122.4194, "America/Los_Angeles"),
-            "chicago", new CityData(41.8781, -87.6298, "America/Chicago"),
-            "boston", new CityData(42.3601, -71.0589, "America/New_York"),
-            "hell", new CityData(63.4452, 10.9052, "Europe/Oslo")
+
+    // todo: load this from a file or something at program start
+    public static Map<String, CityData> shortcutCities = Map.ofEntries(
+            Map.entry("seattle",
+                    new CityData(47.6062, -122.3321, "America/Los_Angeles")),
+            Map.entry("austin",
+                    new CityData(30.2672, -97.7431, "America/Chicago")),
+            Map.entry("glasgow",
+                    new CityData(55.8617, -4.295905, "Europe/London")),
+            Map.entry("edmonton",
+                    new CityData(53.631611, -113.323975, "America/Edmonton")),
+            Map.entry("london",
+                    new CityData(51.5072,-0.1276, "Europe/London")),
+            Map.entry("nyc",
+                    new CityData(40.7128, -74.0060, "America/New_York")),
+            Map.entry("sf",
+                    new CityData(37.7749, -122.4194, "America/Los_Angeles")),
+            Map.entry("chicago",
+                    new CityData(41.8781, -87.6298, "America/Chicago")),
+            Map.entry("minneapolis",
+                    new CityData(44.9778, -93.2650, "America/Chicago")),
+            Map.entry("boston",
+                    new CityData(42.3601, -71.0589, "America/New_York")),
+            Map.entry("hell",
+                    new CityData(63.4452, 10.9052, "Europe/Oslo"))
     );
 
     public enum WMOcode {
