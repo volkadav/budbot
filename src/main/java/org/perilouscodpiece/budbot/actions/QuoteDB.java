@@ -5,13 +5,33 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.sql.*;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
-public class QuoteDB {
-    private static String DB_PATH = "budbot_quotes.db";
-    private static String JDBC_URL = "jdbc:sqlite:" + DB_PATH;
+public class QuoteDB extends PersistentCommand {
 
-    public static String process(List<String> commandTokens) {
+    public QuoteDB() {
+        initDB(getJdbcURL(),getExpectedTables());
+    }
+
+    @Override
+    String getJdbcURL() {
+        return PersistentCommand.jdbcBaseURL + "budbot_quotes.db";
+    }
+
+    @Override
+    Map<String, String> getExpectedTables() {
+        return Map.of(
+                "quotes",
+                """
+                    create table if not exists quotes(
+                        id integer not null autoincrement primary key,
+                        quote text not null);"""
+        );
+    }
+
+    @Override
+    public String process(List<String> commandTokens) {
         String response;
         if (commandTokens.isEmpty()) {
             response = "please provide a command (add/get n/random/status/del n)";

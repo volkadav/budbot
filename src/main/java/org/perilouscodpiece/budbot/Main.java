@@ -30,11 +30,10 @@ public class Main {
         }
         log.debug("Using api key from jar file: " + telegramApiKey);
 
+        // register bot s that it receives messages
         try {
-            // register bot
             TelegramBotsApi botsApi = new TelegramBotsApi(DefaultBotSession.class);
             botsApi.registerBot(new BudBot(telegramApiKey));
-
         } catch (TelegramApiException tae) {
             System.err.println("Received exception registering budbot: " + tae.getMessage());
             System.exit(1);

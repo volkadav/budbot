@@ -10,12 +10,24 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 public class BudBot extends TelegramLongPollingBot {
+    private Map<String, PersistentCommand> persistentCommandMap;
+
     public BudBot(String telegramApiToken) {
         super(telegramApiToken);
+        persistentCommandMap = new HashMap<>();
+        initPersistentCommands();
+    }
+
+    public void initPersistentCommands() {
+        // todo: automated discovery here?
+        persistentCommandMap.put("quoteDB", new QuoteDB());
+        persistentCommandMap.put("karma", new Karma());
     }
 
     @Override
@@ -57,7 +69,8 @@ public class BudBot extends TelegramLongPollingBot {
             case "!cointoss" -> CoinToss.tossCoin();
             case "!dice", "!roll" -> Dice.roll(cmdTokens);
             case "!weather" -> Weather.getCurrentWeather(cmdTokens.stream().reduce("", String::concat));
-            case "!quote" -> QuoteDB.process(cmdTokens);
+            case "!quote" -> persistentCommandMap.get("quoteDB").process(cmdTokens);
+            case "!karma" -> persistentCommandMap.get("karma").process(cmdTokens);
             default -> "Sorry, I don't understand '" + msgText + "'.";
         };
         log.debug("response: {}", response);
