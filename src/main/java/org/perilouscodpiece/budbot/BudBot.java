@@ -20,12 +20,12 @@ public class BudBot extends TelegramLongPollingBot {
 
     public BudBot(String telegramApiToken) {
         super(telegramApiToken);
-        persistentCommandMap = new HashMap<>();
         initPersistentCommands();
     }
 
     public void initPersistentCommands() {
         // todo: automated discovery here?
+        persistentCommandMap = new HashMap<>();
         persistentCommandMap.put("quoteDB", new QuoteDB());
         persistentCommandMap.put("karma", new Karma());
     }

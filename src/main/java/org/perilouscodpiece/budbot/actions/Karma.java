@@ -1,7 +1,9 @@
 package org.perilouscodpiece.budbot.actions;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 public class Karma extends PersistentCommand {
     public Karma() {
@@ -17,17 +19,56 @@ public class Karma extends PersistentCommand {
     Map<String, String> getExpectedTables() {
         return Map.of(
                 "karma",
-                """create table if not exists karma( 
+                """
+                        create table if not exists karma(
                         entity text not null primary key,
-                        value integer not null);"""
+                        value integer not null);
+                    """
         );
     }
 
     @Override
     public String process(List<String> commandTokens) {
-        String response = "";
+        final String help = "karma usage: get <entity>|<entity>++ or --|reset";
         if (commandTokens.isEmpty()) {
-            response = "please provide a command (get <entity>/++ or -- <entity>/reset)";
+            return help;
+        }
+
+        String response = "";
+
+        String firstToken = commandTokens.get(0).trim().toLowerCase();
+        String secondToken = "";
+        if (commandTokens.size() > 1) {
+            secondToken = commandTokens.get(1).trim().toLowerCase();
+        }
+
+        switch (firstToken) {
+            case "get":
+                response = secondToken +
+                        " karma: " +
+                        executeSQL("select value from karma where entity = ?",
+                                List.of(secondToken),
+                                Optional.of("String"));
+                break;
+            case "reset":
+                for (String statement : List.of("delete from karma", "vacuum")) {
+                    executeSQL(statement, Collections.emptyList(), Optional.empty());
+                }
+                response = "karma reset";
+                break;
+            default:
+                if (secondToken.endsWith("++") || secondToken.endsWith("--")) {
+                    String op = secondToken.endsWith("++") ? "+" : "-";
+                    executeSQL("""
+                            begin transaction;
+                            update karma set value = (select value from karma where entity = ?) %s 1
+                                where entity = ?;
+                            commit;
+                            """.formatted(op), List.of(secondToken, secondToken), Optional.empty());
+                } else {
+                    response = help;
+                }
+                break;
         }
 
         return response;

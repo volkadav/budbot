@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import java.sql.*;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * PersistentCommand - base class for things that persist data over time (e.g. via DB)
@@ -50,7 +51,7 @@ public abstract class PersistentCommand {
         }
     }
 
-    public String executeSQL(String sql, List<Object> params, String resultClassName) {
+    public String executeSQL(String sql, List<Object> params, Optional<String> resultClassName) {
         String result = "";
 
         if (dbConnection == null) {
@@ -82,11 +83,13 @@ public abstract class PersistentCommand {
                 if (sql.startsWith("select count")) {
                     result = Integer.toString(rs.getInt(1));
                 } else if (sql.startsWith("select")) {
-                    result = switch (resultClassName) {
-                        case "String" -> rs.getString(1);
-                        case "Integer" -> Integer.toString(rs.getInt(1));
-                        default -> throw new IllegalStateException("Unexpected value: " + resultClassName);
-                    };
+                    if (resultClassName.isPresent()) {
+                        result = switch (resultClassName.get()) {
+                            case "String" -> rs.getString(1);
+                            case "Integer" -> Integer.toString(rs.getInt(1));
+                            default -> throw new IllegalStateException("Unexpected value: " + resultClassName);
+                        };
+                    }
                 } else {
                     log.warn("Unrecognized query: {}", sql);
                     result = "Unrecognized query!";
