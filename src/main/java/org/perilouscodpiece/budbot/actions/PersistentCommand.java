@@ -4,6 +4,7 @@ import com.google.common.base.Strings;
 import lombok.extern.slf4j.Slf4j;
 
 import java.sql.*;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -51,7 +52,19 @@ public abstract class PersistentCommand {
         }
     }
 
-    public String executeSQL(String sql, List<Object> params, Optional<String> resultClassName) {
+    public String executeSQL(String sql) {
+        return executeSQL(sql, Collections.emptyList(), null);
+    }
+
+    public String executeSQL(String sql, String resultClassName) {
+        return executeSQL(sql, Collections.emptyList(), resultClassName);
+    }
+
+    public String executeSQL(String sql, List<Object> params) {
+        return executeSQL(sql, params, null);
+    }
+
+    public String executeSQL(String sql, List<Object> params, String resultClassName) {
         String result = "";
 
         if (dbConnection == null) {
@@ -83,12 +96,14 @@ public abstract class PersistentCommand {
                 if (sql.startsWith("select count")) {
                     result = Integer.toString(rs.getInt(1));
                 } else if (sql.startsWith("select")) {
-                    if (resultClassName.isPresent()) {
-                        result = switch (resultClassName.get()) {
+                    if (!Strings.isNullOrEmpty(resultClassName)) {
+                        result = switch (resultClassName) {
                             case "String" -> rs.getString(1);
                             case "Integer" -> Integer.toString(rs.getInt(1));
                             default -> throw new IllegalStateException("Unexpected value: " + resultClassName);
                         };
+                    } else {
+                        log.warn("select call to executeSQL with null/empty resultClassName?!");
                     }
                 } else {
                     log.warn("Unrecognized query: {}", sql);

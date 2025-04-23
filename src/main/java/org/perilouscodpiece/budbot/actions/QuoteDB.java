@@ -83,23 +83,23 @@ public class QuoteDB extends PersistentCommand {
     }
 
     private String addQuote(String quote) {
-        return executeSQL("insert into quotes (quote) values (?)", List.of(quote), Optional.empty());
+        return executeSQL("insert into quotes (quote) values (?)", List.of(quote));
     }
 
     private String getQuote(int n) {
-        return executeSQL("select quote from quotes where id = ?", List.of(n), Optional.of("String"));
+        return executeSQL("select quote from quotes where id = ?", List.of(n), "String");
     }
 
     private String getRandomQuote() {
-        return executeSQL("select quote from quotes order by random() limit 1", Collections.emptyList(), Optional.of("String"));
+        return executeSQL("select quote from quotes order by random() limit 1", "String");
     }
 
     private String getQuoteDBStatus() {
         // for now, just return count
-        return "quotedb size: " + executeSQL("select count(*) from quotes", Collections.emptyList(), Optional.of("Integer"));
+        return "quotedb size: " + executeSQL("select count(*) from quotes", Collections.emptyList(), "Integer");
     }
 
     private String deleteQuote(int n) {
-        return executeSQL("delete from quotes where id = ?", List.of(n), Optional.empty());
+        return executeSQL("delete from quotes where id = ?", List.of(n));
     }
 }

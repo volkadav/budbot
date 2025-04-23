@@ -48,11 +48,11 @@ public class Karma extends PersistentCommand {
                         " karma: " +
                         executeSQL("select value from karma where entity = ?",
                                 List.of(secondToken),
-                                Optional.of("String"));
+                                "String");
                 break;
             case "reset":
                 for (String statement : List.of("delete from karma", "vacuum")) {
-                    executeSQL(statement, Collections.emptyList(), Optional.empty());
+                    executeSQL(statement);
                 }
                 response = "karma reset";
                 break;
@@ -64,7 +64,7 @@ public class Karma extends PersistentCommand {
                             update karma set value = (select value from karma where entity = ?) %s 1
                                 where entity = ?;
                             commit;
-                            """.formatted(op), List.of(secondToken, secondToken), Optional.empty());
+                            """.formatted(op), List.of(secondToken, secondToken));
                 } else {
                     response = help;
                 }
