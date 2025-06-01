@@ -1,3 +1,27 @@
+import net.schmizz.sshj.SSHClient
+import net.schmizz.sshj.transport.verification.PromiscuousVerifier
+import net.schmizz.sshj.userauth.keyprovider.KeyProvider
+import java.util.Properties
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath("com.hierynomus:sshj:0.40.0")
+    }
+}
+
+fun loadEnvFile(file: File): Properties {
+    val props = Properties()
+    if (file.exists()) {
+        props.load(file.inputStream())
+    }
+    return props
+}
+
+val env = loadEnvFile(rootProject.file(".env"))
+
 plugins {
     id("java")
     id("com.adarshr.test-logger") version ("3.2.0")
@@ -5,7 +29,7 @@ plugins {
 }
 
 group = "org.perilouscodpiece"
-version = "1.2"
+version = "1.3"
 
 repositories {
     mavenCentral()
@@ -46,4 +70,34 @@ tasks.jar {
 
 tasks.compileJava {
     options.compilerArgs.add("-Xlint:deprecation")
+}
+
+tasks.register("deploy") {
+    dependsOn("build")
+
+    doLast {
+        val host = env.getProperty("DEPLOY_HOST") ?: error("DEPLOY_HOST not set")
+        val user = env.getProperty("DEPLOY_USER") ?: error("DEPLOY_USER not set")
+        val keyPath = env.getProperty("DEPLOY_SSH_KEY") ?: error("DEPLOY_SSH_KEY not set")
+        val remotePath = env.getProperty("DEPLOY_PATH") ?: error("DEPLOY_PATH not set")
+
+        val jarFile = tasks.named("jar").get().outputs.files.singleFile
+
+        println("Deploying ${jarFile.name} to $user@$host:$remotePath using ssh keyfile $keyPath")
+
+        val ssh = SSHClient()
+        ssh.addHostKeyVerifier(PromiscuousVerifier()) // WARNING: disables host key checking - use with care
+        ssh.connect(host)
+
+        val keyProvider: KeyProvider = ssh.loadKeys(keyPath)
+        ssh.authPublickey(user, keyProvider)
+
+        val sftp = ssh.newSFTPClient()
+        sftp.put(jarFile.absolutePath, "$remotePath")
+        sftp.close()
+
+        ssh.disconnect()
+
+        println("Deploy complete!")
+    }
 }

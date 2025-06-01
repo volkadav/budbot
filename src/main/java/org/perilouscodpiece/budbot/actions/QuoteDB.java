@@ -25,7 +25,7 @@ public class QuoteDB extends PersistentCommand {
                 "quotes",
                 """
                     create table if not exists quotes(
-                        id integer not null autoincrement primary key,
+                        id integer not null primary key autoincrement,
                         quote text not null);
                     """
         );

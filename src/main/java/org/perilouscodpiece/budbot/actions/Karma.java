@@ -44,7 +44,7 @@ public class Karma extends PersistentCommand {
             case "get":
                 response = secondToken +
                         " karma: " +
-                        executeSQL("select value from karma where entity = ?",
+                        executeSQL("select coalesce(value, 0) from karma where entity = ?",
                                 List.of(secondToken),
                                 "String");
                 break;
@@ -55,14 +55,21 @@ public class Karma extends PersistentCommand {
                 response = "karma reset";
                 break;
             default:
-                if (secondToken.endsWith("++") || secondToken.endsWith("--")) {
-                    String op = secondToken.endsWith("++") ? "+" : "-";
+                if (firstToken.endsWith("++") || firstToken.endsWith("--")) {
+                    String op = firstToken.endsWith("++") ? "+" : "-";
+                    String name = firstToken
+                            .replace("++","")
+                            .replace("--", "");
+                    String sqlname = name.replace("'","''");
+
+                    // sqlite jdbc doesn't support multi-statement strings with placeholders, hence nastiness here
                     executeSQL("""
                             begin transaction;
-                            update karma set value = (select value from karma where entity = ?) %s 1
-                                where entity = ?;
+                            insert into karma (entity, value) values ('%s', 0) on conflict(entity) do nothing;
+                            update karma set value = value %s 1 where entity = '%s';
                             commit;
-                            """.formatted(op), List.of(secondToken, secondToken));
+                            """.formatted(sqlname, op, sqlname));
+                    response = executeSQL("select value from karma where entity = ?", List.of(name), "String");
                 } else {
                     response = help;
                 }

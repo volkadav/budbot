@@ -121,10 +121,13 @@ public abstract class PersistentCommand {
         } catch (SQLException sqle) {
             result = "DB error: " + sqle.getMessage();
             log.error(result, sqle);
-            return result;
         }
 
         return result;
+    }
+
+    public void executeTransaction(List<String> statements) {
+
     }
 
     abstract String getJdbcURL();
