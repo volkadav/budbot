@@ -1,9 +1,7 @@
 package org.perilouscodpiece.budbot.actions;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 public class Karma extends PersistentCommand {
     public Karma() {

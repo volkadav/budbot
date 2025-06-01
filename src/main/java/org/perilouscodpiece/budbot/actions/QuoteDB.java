@@ -3,11 +3,9 @@ package org.perilouscodpiece.budbot.actions;
 import com.google.common.base.Joiner;
 import lombok.extern.slf4j.Slf4j;
 
-import java.sql.*;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 @Slf4j
 public class QuoteDB extends PersistentCommand {
@@ -38,45 +36,45 @@ public class QuoteDB extends PersistentCommand {
         String response;
         if (commandTokens.isEmpty()) {
             response = "please provide a command (add/get n/random/status/del n)";
-        }
-
-        switch (commandTokens.get(0).trim().toLowerCase()) {
-            case "add":
-                commandTokens.remove(0);
-                response = addQuote(Joiner.on(' ').join(commandTokens));
-                break;
-            case "get":
-            case "id":
-                try {
-                    response = getQuote(Integer.parseInt(commandTokens.get(1)));
-                } catch (NumberFormatException nfe) {
-                    response = "unparseable quote number";
-                } catch (ArrayIndexOutOfBoundsException aioobe) {
-                    response = "please provide a quote id";
-                }
-                break;
-            case "random":
-            case "rand":
-                response = getRandomQuote();
-                break;
-            case "status":
-            case "stats":
-            case "count":
-                response = getQuoteDBStatus();
-                break;
-            case "delete":
-            case "del":
-            case "rm":
-                try {
-                    response = deleteQuote(Integer.parseInt(commandTokens.get(1)));
-                } catch (NumberFormatException nfe) {
-                    response = "unparseable quote number";
-                } catch (ArrayIndexOutOfBoundsException aioobe) {
-                    response = "please provide a quote id";
-                }
-                break;
-            default:
-                response = "Sorry, I don't recognize the command '" + commandTokens.stream().reduce("", String::concat) + "'.";
+        } else {
+            switch (commandTokens.get(0).trim().toLowerCase()) {
+                case "add":
+                    commandTokens.remove(0);
+                    response = addQuote(Joiner.on(' ').join(commandTokens));
+                    break;
+                case "get":
+                case "id":
+                    try {
+                        response = getQuote(Integer.parseInt(commandTokens.get(1)));
+                    } catch (NumberFormatException nfe) {
+                        response = "unparseable quote number";
+                    } catch (ArrayIndexOutOfBoundsException aioobe) {
+                        response = "please provide a quote id";
+                    }
+                    break;
+                case "random":
+                case "rand":
+                    response = getRandomQuote();
+                    break;
+                case "status":
+                case "stats":
+                case "count":
+                    response = getQuoteDBStatus();
+                    break;
+                case "delete":
+                case "del":
+                case "rm":
+                    try {
+                        response = deleteQuote(Integer.parseInt(commandTokens.get(1)));
+                    } catch (NumberFormatException nfe) {
+                        response = "unparseable quote number";
+                    } catch (ArrayIndexOutOfBoundsException aioobe) {
+                        response = "please provide a quote id";
+                    }
+                    break;
+                default:
+                    response = "Sorry, I don't recognize the command '" + commandTokens.stream().reduce("", String::concat) + "'.";
+            }
         }
 
         return response;

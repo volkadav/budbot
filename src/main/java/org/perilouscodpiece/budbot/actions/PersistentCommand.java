@@ -7,7 +7,6 @@ import java.sql.*;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 /**
  * PersistentCommand - base class for things that persist data over time (e.g. via DB)
