@@ -1,8 +1,11 @@
 package org.perilouscodpiece.budbot.actions;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 public class Karma extends PersistentCommand {
     public Karma() {
         initDB(getJdbcURL(), getExpectedTables());
@@ -60,15 +63,19 @@ public class Karma extends PersistentCommand {
                     String name = firstToken
                             .replace("++","")
                             .replace("--", "");
-                    String sqlname = name.replace("'","''");
 
-                    // sqlite jdbc doesn't support multi-statement strings with placeholders, hence nastiness here
-                    executeSQL("""
-                            begin transaction;
-                            insert into karma (entity, value) values ('%s', 0) on conflict(entity) do nothing;
-                            update karma set value = value %s 1 where entity = '%s';
-                            commit;
-                            """.formatted(sqlname, op, sqlname));
+                    List<String> queries = List.of(
+                            "insert into karma (entity, value) values (?, 0) on conflict(entity) do nothing;",
+                            "update karma set value = value %s 1 where entity = ?".formatted(op)
+                    );
+                    List<List<Object>> paramsLists = List.of(
+                            List.of(name),
+                            List.of(name)
+                    );
+                    if (!executeTransaction(queries, paramsLists)) {
+                        log.warn("karma update transaction failed");
+                    }
+
                     response = executeSQL("select value from karma where entity = ?", List.of(name), "String");
                 } else {
                     response = help;

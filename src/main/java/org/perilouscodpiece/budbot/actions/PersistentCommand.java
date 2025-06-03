@@ -64,25 +64,14 @@ public abstract class PersistentCommand {
     }
 
     public String executeSQL(String sql, List<Object> params, String resultClassName) {
-        String result = "";
-
         if (dbConnection == null) {
-            result = "no active db connection!";
-            return result;
+            return "no active db connection!";
         }
 
+        String result = "";
         try {
             log.info("Executing {} with params {} and expected result class {}", sql, params, resultClassName);
-            PreparedStatement stmt = dbConnection.prepareStatement(sql);
-            // Is there a prettier way to do this? Ugh.
-            for (int i = 0; i < params.size(); i++) {
-                Object param = params.get(i);
-                if (param instanceof Integer) {
-                    stmt.setInt(i + 1, (Integer)param);
-                } else if (param instanceof String) {
-                    stmt.setString(i + 1, (String)param);
-                }
-            }
+            PreparedStatement stmt = prepareStatement(dbConnection, sql, params);
             stmt.execute();
 
             if (sql.startsWith("select")) {
@@ -126,8 +115,45 @@ public abstract class PersistentCommand {
         return result;
     }
 
-    public void executeTransaction(List<String> statements) {
+    private PreparedStatement prepareStatement(Connection conn, String sql, List<Object> params) throws SQLException {
+        PreparedStatement stmt = conn.prepareStatement(sql);
 
+        // Is there a prettier way to do this? Ugh.
+        for (int i = 0; i < params.size(); i++) {
+            Object param = params.get(i);
+            if (param instanceof Integer) {
+                stmt.setInt(i + 1, (Integer)param);
+            } else if (param instanceof String) {
+                stmt.setString(i + 1, (String)param);
+            }
+        }
+
+        return stmt;
+    }
+
+    public boolean executeTransaction(List<String> queries, List<List<Object>> params) {
+        if (queries.size() != params.size()) {
+            log.warn("transaction arg mismatch: queries: {} params lists: {}", queries.size(), params.size());
+            return false;
+        }
+
+        try (Connection txnConn = DriverManager.getConnection(dbConnection.getMetaData().getURL())) {
+            txnConn.setAutoCommit(false); // sqlite driver begins txn automatically on first read/write execute()
+
+            for (int i = 0; i < queries.size(); i++) {
+                PreparedStatement stmt = prepareStatement(txnConn, queries.get(i), params.get(i));
+                if (!stmt.execute()) {
+                   txnConn.rollback();
+                   return false;
+                }
+            }
+
+            txnConn.commit();
+        } catch (SQLException sqle) {
+            log.warn("exception while running transaction:", sqle);
+        }
+
+        return true;
     }
 
     abstract String getJdbcURL();
