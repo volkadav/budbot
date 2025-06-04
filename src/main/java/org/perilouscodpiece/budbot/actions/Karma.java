@@ -1,5 +1,6 @@
 package org.perilouscodpiece.budbot.actions;
 
+import com.google.common.base.Joiner;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
@@ -35,7 +36,7 @@ public class Karma extends PersistentCommand {
             return help;
         }
 
-        String response = "";
+        String response;
 
         String firstToken = commandTokens.get(0).trim().toLowerCase();
         String secondToken = "";
@@ -52,17 +53,17 @@ public class Karma extends PersistentCommand {
                                 "String");
                 break;
             case "reset":
-                for (String statement : List.of("delete from karma", "vacuum")) {
-                    executeSQL(statement);
-                }
+                executeSQL("delete from karma");
                 response = "karma reset";
                 break;
             default:
-                if (firstToken.endsWith("++") || firstToken.endsWith("--")) {
+                log.info("firstToken: {}, {}", firstToken, Joiner.on(' ').join(firstToken.chars().iterator()));
+                if (firstToken.matches("\\w+(\\+\\+|--|\u2014)$")) { // u2014 = em dash, because (some?) telegram clients collapse -- to that
                     String op = firstToken.endsWith("++") ? "+" : "-";
                     String name = firstToken
                             .replace("++","")
-                            .replace("--", "");
+                            .replace("--", "")
+                            .replace("\u2014", "");
 
                     List<String> queries = List.of(
                             "insert into karma (entity, value) values (?, 0) on conflict(entity) do nothing;",

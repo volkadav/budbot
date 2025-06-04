@@ -46,9 +46,18 @@ public abstract class PersistentCommand {
                     log.info("Table '{}' already exists.", expectedTable);
                 }
             }
+
+            for (String initQuery : List.of(
+                    "PRAGMA auto_vacuum = FULL;",
+                    "PRAGMA incremental_vacuum;"
+            )) {
+                dbConnection.createStatement().execute(initQuery);
+            }
         } catch (SQLException sqle) {
             log.error("init db sql exception: " + sqle.getMessage(), sqle);
         }
+
+        log.info("DB init complete for {}", jdbcURL);
     }
 
     public String executeSQL(String sql) {
@@ -70,6 +79,10 @@ public abstract class PersistentCommand {
 
         String result = "";
         try {
+            if (dbConnection.isClosed()) {
+                return "db connection is closed!";
+            }
+
             log.info("Executing {} with params {} and expected result class {}", sql, params, resultClassName);
             PreparedStatement stmt = prepareStatement(dbConnection, sql, params);
             stmt.execute();
@@ -119,11 +132,14 @@ public abstract class PersistentCommand {
         PreparedStatement stmt = conn.prepareStatement(sql);
 
         // Is there a prettier way to do this? Ugh.
+        log.info("Preparing query: {}", sql);
         for (int i = 0; i < params.size(); i++) {
             Object param = params.get(i);
             if (param instanceof Integer) {
+                log.info("Setting integer param {} to {}", i + 1, param);
                 stmt.setInt(i + 1, (Integer)param);
             } else if (param instanceof String) {
+                log.info("Setting string param {} to {}", i + 1, param);
                 stmt.setString(i + 1, (String)param);
             }
         }
@@ -137,20 +153,34 @@ public abstract class PersistentCommand {
             return false;
         }
 
-        try (Connection txnConn = DriverManager.getConnection(dbConnection.getMetaData().getURL())) {
-            txnConn.setAutoCommit(false); // sqlite driver begins txn automatically on first read/write execute()
+        try {
+            if (dbConnection.isClosed()) {
+                log.warn("trying to execute a transaction on a closed connection?!");
+                return false;
+            }
+
+            dbConnection.setAutoCommit(false); // sqlite driver begins txn automatically on first read/write execute()
 
             for (int i = 0; i < queries.size(); i++) {
-                PreparedStatement stmt = prepareStatement(txnConn, queries.get(i), params.get(i));
-                if (!stmt.execute()) {
-                   txnConn.rollback();
-                   return false;
+                try (PreparedStatement stmt = prepareStatement(dbConnection, queries.get(i), params.get(i))) {
+                    stmt.execute();
+                } catch (Exception e) {
+                    log.warn("exception while executing transaction query", e);
+                    dbConnection.rollback();
+                    throw e;
                 }
             }
 
-            txnConn.commit();
+            dbConnection.commit();
         } catch (SQLException sqle) {
             log.warn("exception while running transaction:", sqle);
+            return false;
+        } finally {
+            try {
+                dbConnection.setAutoCommit(true);
+            } catch (SQLException sqle) {
+                log.warn("can't set autocommit back to true", sqle);
+            }
         }
 
         return true;
