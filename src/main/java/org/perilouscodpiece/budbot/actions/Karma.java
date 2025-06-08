@@ -57,7 +57,6 @@ public class Karma extends PersistentCommand {
                 response = "karma reset";
                 break;
             default:
-                log.info("firstToken: {}, {}", firstToken, Joiner.on(' ').join(firstToken.chars().iterator()));
                 if (firstToken.matches("\\w+(\\+\\+|--|\u2014)$")) { // u2014 = em dash, because (some?) telegram clients collapse -- to that
                     String op = firstToken.endsWith("++") ? "+" : "-";
                     String name = firstToken
@@ -77,7 +76,9 @@ public class Karma extends PersistentCommand {
                         log.warn("karma update transaction failed");
                     }
 
-                    response = executeSQL("select value from karma where entity = ?", List.of(name), "String");
+                    response = name + " new karma: " +
+                            executeSQL("select value from karma where entity = ?",
+                                    List.of(name), "String");
                 } else {
                     response = help;
                 }
